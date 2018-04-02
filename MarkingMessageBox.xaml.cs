@@ -104,16 +104,20 @@ namespace MMB
         {
             DialogResult = true;
             Hide();
-            // 遮罩添加淡出效果
-            DoubleAnimation daFadeOut = new DoubleAnimation(0.0, new Duration(TimeSpan.FromMilliseconds(500)));
-            daFadeOut.Completed += (o, a) =>
+            if(Owner != null)
             {
-                // 移除遮罩（Grid最后一个儿子的索引）
-                _mainGrid.Children.RemoveAt(_mainGrid.Children.Count - 1);
+                // 遮罩添加淡出效果
+                DoubleAnimation daFadeOut = new DoubleAnimation(0.0, new Duration(TimeSpan.FromMilliseconds(500)));
+                daFadeOut.Completed += (o, a) =>
+                {
+                    // 移除遮罩（Grid最后一个儿子的索引）
+                    _mainGrid.Children.RemoveAt(_mainGrid.Children.Count - 1);
 
-                Close();
-            };
-            ((Border) _mainGrid.Children[_mainGrid.Children.Count - 1]).BeginAnimation(Border.OpacityProperty, daFadeOut);
+                    Close();
+                };
+                ((Border) _mainGrid.Children[_mainGrid.Children.Count - 1]).BeginAnimation(Border.OpacityProperty, daFadeOut);
+
+            }
         }
 
         /// <summary>
@@ -125,16 +129,20 @@ namespace MMB
         {
             DialogResult = true;
             Hide();
-            // 遮罩添加淡出效果
-            DoubleAnimation daFadeOut = new DoubleAnimation(0.0, new Duration(TimeSpan.FromMilliseconds(500)));
-            daFadeOut.Completed += (o, a) =>
+            if(Owner != null)
             {
-                // 移除遮罩（Grid最后一个儿子的索引）
-                _mainGrid.Children.RemoveAt(_mainGrid.Children.Count - 1);
+                // 遮罩添加淡出效果
+                DoubleAnimation daFadeOut = new DoubleAnimation(0.0, new Duration(TimeSpan.FromMilliseconds(500)));
+                daFadeOut.Completed += (o, a) =>
+                {
+                    // 移除遮罩（Grid最后一个儿子的索引）
+                    _mainGrid.Children.RemoveAt(_mainGrid.Children.Count - 1);
 
-                Close();
-            };
-            ((Border) _mainGrid.Children[_mainGrid.Children.Count - 1]).BeginAnimation(Border.OpacityProperty, daFadeOut);
+                    Close();
+                };
+                ((Border) _mainGrid.Children[_mainGrid.Children.Count - 1]).BeginAnimation(Border.OpacityProperty, daFadeOut);
+
+            }
         }
 
         /// <summary>
@@ -167,7 +175,7 @@ namespace MMB
         /// </summary>
         /// <param name="owner"></param>
         /// <returns></returns>
-        public bool Invoke(Window owner, string message, string caption)
+        public bool Invoke(string message, string caption, Window owner = null)
         {
             // 设置父窗口
             Owner = owner;
@@ -179,31 +187,37 @@ namespace MMB
             // 设置数据上下文
             DataContext = this;
 
-            // 获取主Grid
-            _mainGrid = GetChildObjects<Grid>(Owner, null).FirstOrDefault();
-            if (null == _mainGrid)
-                return false;
-            // 初始化遮罩
-            var marking = new Border
+            if (Owner != null)
             {
-                Name = "Masking",
-                BorderThickness = new Thickness(0),
-                Opacity = 0.0,
-                Background = Brushes.Black
-            };
-            marking.SetBinding(WidthProperty, new Binding("Width") { Source = _mainGrid });
-            marking.SetBinding(HeightProperty, new Binding("Height") { Source = _mainGrid });
-            // 将遮罩置顶
-            Panel.SetZIndex(marking, 99);
+                // 获取主Grid
+                _mainGrid = GetChildObjects<Grid>(Owner, null).FirstOrDefault();
+                if (null == _mainGrid)
+                    return false;
+                // 初始化遮罩
+                var marking = new Border
+                {
+                    Name = "Masking",
+                    BorderThickness = new Thickness(0),
+                    Opacity = 0.0,
+                    Background = Brushes.Black
+                };
+                marking.SetBinding(WidthProperty, new Binding("Width") { Source = _mainGrid });
+                marking.SetBinding(HeightProperty, new Binding("Height") { Source = _mainGrid });
+                // 将遮罩置顶
+                Panel.SetZIndex(marking, 99);
 
-            // 设置遮罩在Grid的布局
-            if (_mainGrid.RowDefinitions.Count > 0)
-                Grid.SetRowSpan(marking, _mainGrid.RowDefinitions.Count);
-            if (_mainGrid.ColumnDefinitions.Count > 0)
-                Grid.SetColumnSpan(marking, _mainGrid.ColumnDefinitions.Count);
-            _mainGrid.Children.Add(marking);
-            // 开启淡入效果
-            marking.BeginAnimation(Border.OpacityProperty, new DoubleAnimation(0.5, new Duration(TimeSpan.FromMilliseconds(500))));
+                // 设置遮罩在Grid的布局
+                if (_mainGrid.RowDefinitions.Count > 0)
+                    Grid.SetRowSpan(marking, _mainGrid.RowDefinitions.Count);
+                if (_mainGrid.ColumnDefinitions.Count > 0)
+                    Grid.SetColumnSpan(marking, _mainGrid.ColumnDefinitions.Count);
+                _mainGrid.Children.Add(marking);
+                // 开启淡入效果
+                marking.BeginAnimation(Border.OpacityProperty, new DoubleAnimation(0.5, new Duration(TimeSpan.FromMilliseconds(500))));
+
+            }
+            else
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             return ShowDialog().Value;
         }
