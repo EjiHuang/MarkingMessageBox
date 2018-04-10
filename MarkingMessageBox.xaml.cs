@@ -102,7 +102,7 @@ namespace MMB
         /// <param name="e"></param>
         private void BtnCancelClick(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            DialogResult = false;
             Hide();
             if(Owner != null)
             {
